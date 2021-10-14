@@ -19,17 +19,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('notify', \App\Http\Controllers\TaskController::class . '@notify');
-
-Route::post('/tokens/create', function (Request $request) {
-    $token = $request->user()->createToken($request->token_name);
-
-    return ['token' => $token->plainTextToken];
-});
+Route::post('message/add', \App\Http\Controllers\MessageController::class . '@add');
+Route::middleware('auth:sanctum')->post('message/private/add', \App\Http\Controllers\MessageController::class . '@addPrivate');
 
 Route::post('/auth/login', [AuthController::class, 'login']);
 
-Route::get('/ably/auth', function () {
+
+Route::middleware('auth:sanctum')->get('/ably/auth', function () {
     $client = new Ably\AblyRest(getenv('ABLY_KEY'));
 
     return $client->auth->createTokenRequest()->toArray();
